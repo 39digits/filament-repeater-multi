@@ -48,15 +48,19 @@ class SupplierResource extends Resource
                                 })->pluck('name', 'id');
                             })
 
+                            // ===========================================================
                             // Turning it into a multi-select turns this field into an array.
                             // And I don't know how to handle the data to create a single
-                            // row in the pivot table.  As the data doesn't persist in the
-                            // $data or $record variables when trying to handleRecordUpdate / Create.
+                            // row in the pivot table for each combination of product_id
+                            // and variant_id.
+                            // An error is thrown before it even gets to either the
+                            // handleRecordUpdate or handleRecordCreate methods.
+                            ->preload()
                             //->multiple()
-                            //->preload()
+                            // ===========================================================
 
                             ->required(),
-                    ])
+                    ]),
             ]);
     }
 
