@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Models\SupplierProductVariant;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Variant;
@@ -32,6 +33,24 @@ class DatabaseSeeder extends Seeder
             $product->variants()->attach($variants->random(rand(3,5)));
         });
 
-        Supplier::factory(10)->create();
+        Supplier::factory(10)->create()
+        // Now for each supplier, add 1-2 products with between 2-3 variants
+            ->each(function ($supplier) {
+                $randomProducts = Product::get()->random(rand(1,2));
+                foreach($randomProducts as $product) {
+                    $randomVariants = $product->variants->random(rand(2,3));
+                    foreach($randomVariants as $variant) {
+                        SupplierProductVariant::create([
+                            'supplier_id' => $supplier->id,
+                            'product_id' => $product->id,
+                            'variant_id' => $variant->id,
+                        ]);
+                    }
+                }
+            });
+
+
+
+
     }
 }
