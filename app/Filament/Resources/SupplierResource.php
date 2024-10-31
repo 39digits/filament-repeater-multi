@@ -70,6 +70,19 @@ class SupplierResource extends Resource
                                 ])
                             )
                         );
+                        // I was hoping I could just call
+                        // $component->loadStateFromRelationships(true) here, but it doesn't work.
+                        $component->loadStateFromRelationshipsUsing(static function (Repeater $component) {
+                            $result = $component->getRelationship()->get()
+                                ->groupBy(function ($item) {
+                                    return $item['supplier_id'] . '-' . $item['product_id'];
+                                })->map(function ($group) {
+                                    $first = $group->first();
+                                    $first['variant_id'] = $group->pluck('variant_id')->all();
+                                    return $first;
+                                })->values()->all();
+                            return $result;
+                        });
                     })
                     ->loadStateFromRelationshipsUsing(static function (Repeater $component) {
                         /*
@@ -99,9 +112,11 @@ class SupplierResource extends Resource
                             })->values()->all();
                         // dd($result);
                         $component->state($result);
+                        return $result;
                     })
             ]);
     }
+
 
     public static function table(Table $table): Table
     {
